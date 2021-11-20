@@ -41,3 +41,5 @@ Werkzeug==2.0.2
 wheel==0.36.2
 wrapt==1.13.3
 zipp==3.6.0
+
+gym~=0.21.0

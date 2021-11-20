@@ -42,7 +42,7 @@ class DQN(BaseModel):
             return history.history['loss']
 
     def replay(self, states, actions, rewards, next_states, terminals):
-        q_values = self.target_network.predict(np.array(states))  # get q value at state t by target network
+        q_values = self.training_network.predict(np.array(states))  # get q value at state t by training network
         nq_values = self.target_network.predict(np.array(next_states))  # get q value at state t+1 by target network
         for i in range(len(states)):
             a = actions[i]
