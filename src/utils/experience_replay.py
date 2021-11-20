@@ -19,7 +19,7 @@ class ExperienceReplay:
             self.memory[self.index] = sample
         self.index = (self.index + 1) % self.e_max
 
-    def sample_experience(self, sample_size: int, cer_mode: bool):
+    def sample_experience(self, sample_size: int, cer_mode: bool = False):
         samples = random.sample(self.memory, sample_size)
         if cer_mode:
             samples.append(self.memory[self.index - 1])
