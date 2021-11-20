@@ -1,4 +1,4 @@
-from rf_model.baseModel import BaseModel
+from baseModel import BaseModel
 from addon.epsilon_greedy import EpsilonGreedy
 from addon.experience_replay import ExperienceReplay
 from tensorflow.keras import Sequential
