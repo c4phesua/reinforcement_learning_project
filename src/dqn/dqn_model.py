@@ -54,5 +54,10 @@ class DQN(BaseModel):
                 q_values[i][a] = r + self.gamma * np.max(nq_values[i])
         return states, q_values
 
-    def update_target_network(self):
-        self.target_network.set_weights(self.training_network.get_weights())
+    def update_target_network(self, tau: float = None):
+        if tau is None:
+            self.target_network.set_weights(self.training_network.get_weights())
+        else:
+            target_weight = np.array(self.training_network.get_weights()) * tau + (1 - tau) * \
+                            np.array(self.target_network.get_weights())
+            self.target_network.set_weights(target_weight)
