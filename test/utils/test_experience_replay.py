@@ -39,8 +39,8 @@ class TestExperienceReplay(TestCase):
         expected_r_batch = [18, 8, 3]
         expected_ns_batch = [19, 9, 4]
         expected_done_batch = [20, 10, 5]
-        self.assertTrue(np.array_equal(expected_s_batch, s_batch))
-        self.assertTrue(np.array_equal(expected_a_batch, a_batch))
-        self.assertTrue(np.array_equal(expected_r_batch, r_batch))
-        self.assertTrue(np.array_equal(expected_ns_batch, ns_batch))
-        self.assertTrue(np.array_equal(expected_done_batch, done_batch))
+        np.testing.assert_array_equal(expected_s_batch, s_batch)
+        np.testing.assert_array_equal(expected_a_batch, a_batch)
+        np.testing.assert_array_equal(expected_r_batch, r_batch)
+        np.testing.assert_array_equal(expected_ns_batch, ns_batch)
+        np.testing.assert_array_equal(expected_done_batch, done_batch)
