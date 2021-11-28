@@ -43,3 +43,4 @@ wrapt==1.13.3
 zipp==3.6.0
 
 gym~=0.21.0
+matplotlib~=3.5.0

@@ -1,4 +1,4 @@
-from baseModel import BaseModel
+from src.dqn.baseModel import BaseModel
 from src.utils.epsilon_greedy import EpsilonGreedy
 from src.utils.experience_replay import ExperienceReplay
 from tensorflow.keras import Sequential
