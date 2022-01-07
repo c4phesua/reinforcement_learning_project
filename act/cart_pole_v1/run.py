@@ -1,16 +1,15 @@
-from copy import deepcopy
-from multiprocessing import Queue
-
 import gym
 import matplotlib.pyplot as plt
 from tensorflow.keras import losses
 from tensorflow.keras import optimizers
 from tensorflow.keras.layers import Dense
 
-from act.cart_pole_v1.evaluation import Evaluation
 from src.dqn.dqn_model import DQN
+from src.utils.file_utils import create_save_weight_file_path
+from src.utils.sqlite_utils import create_connection, get_latest_weight, insert_data, create_table
 
-weights_transferring = Queue()
+DATABASE_NAME = 'cart_pole_v1.db'
+TABLE_NAME = 'cart_pole_v1_save'
 
 
 def reward_function(total_reward, current_reward, terminate):
@@ -37,8 +36,11 @@ if __name__ == '__main__':
     env = gym.make('CartPole-v0')
     print(env.reset())
     decay_value = 0.981
-    evaluate = Evaluation(weights_transferring)
-    evaluate.start()
+    db_conn = create_connection(DATABASE_NAME)
+    create_table(db_conn, TABLE_NAME)
+    latest_save = get_latest_weight(db_conn, table_name=TABLE_NAME)
+    if latest_save is not None:
+        agent.training_network.load_weights(filepath=latest_save.weight_file)
 
     for i in range(episode):
         print('----------episode', i, '------------')
@@ -55,7 +57,8 @@ if __name__ == '__main__':
             agent.update_target_network(0.02)
             agent.epsilon_greedy.decay(decay_value, 0.01)
         if i % 20 == 0:
-            weights_transferring.put(deepcopy(agent.training_network.get_weights()))
-    weights_transferring.put(None)
+            file_path = create_save_weight_file_path()
+            agent.training_network.save(filepath=file_path)
+            insert_data(file_path, i, db_conn, TABLE_NAME)
     plt.show()
-    evaluate.join()
+    db_conn.close()
