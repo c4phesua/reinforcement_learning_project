@@ -58,7 +58,7 @@ if __name__ == '__main__':
             agent.epsilon_greedy.decay(decay_value, 0.01)
         if i % 20 == 0:
             file_path = create_save_weight_file_path()
-            agent.training_network.save(filepath=file_path)
+            agent.training_network.save_weights(filepath=file_path)
             insert_data(file_path, i, db_conn, TABLE_NAME)
     plt.show()
     db_conn.close()
