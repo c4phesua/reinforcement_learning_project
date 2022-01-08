@@ -1,3 +1,5 @@
+import time
+
 import gym
 from tensorflow.keras import losses
 from tensorflow.keras import optimizers
@@ -8,6 +10,7 @@ from src.dqn.dqn_model import DQN
 from src.utils.sqlite_utils import get_not_evaluate_latest_weight, create_connection, update_data
 
 if __name__ == '__main__':
+    sleep_time = 0.5
     agent = DQN(1, 1, 200, 10000)
     optimizer = optimizers.Adam(learning_rate=0.0025)
     agent.training_network.add(Dense(16, activation='relu', input_shape=(4,)))
@@ -21,6 +24,7 @@ if __name__ == '__main__':
         last_save = get_not_evaluate_latest_weight(db_conn, table_name=TABLE_NAME)
         db_conn.close()
         if last_save is not None:
+            sleep_time = 0.5
             weight_file = last_save.weight_file
             test_scores = list()
             print('start testing')
@@ -36,3 +40,6 @@ if __name__ == '__main__':
                 test_scores.append(t_score)
             average_score = sum(test_scores) / episode
             update_data(last_save.id, average_score, db_conn, table_name=TABLE_NAME)
+        else:
+            time.sleep(sleep_time)
+            sleep_time = min(sleep_time * 2, 2.5)
