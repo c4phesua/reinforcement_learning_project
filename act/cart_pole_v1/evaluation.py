@@ -41,5 +41,6 @@ if __name__ == '__main__':
             average_score = sum(test_scores) / episode
             update_data(last_save.id, average_score, db_conn, table_name=TABLE_NAME)
         else:
+            print('------waiting for new save-------')
             time.sleep(sleep_time)
             sleep_time = min(sleep_time * 2, 2.5)
