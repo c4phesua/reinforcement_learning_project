@@ -58,7 +58,7 @@ def insert_data(weight_file, episode, conn: sqlite3.Connection, table_name) -> N
     cur.close()
 
 
-def update_date(record_id, score, conn: sqlite3.Connection, table_name) -> None:
+def update_data(record_id, score, conn: sqlite3.Connection, table_name) -> None:
     sql_statement = f'''UPDATE {table_name}
                         SET score = ?, evaluated = ?
                         WHERE id = ?;'''

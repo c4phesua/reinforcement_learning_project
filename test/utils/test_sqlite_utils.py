@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from src.utils.sqlite_utils import create_connection, create_table, insert_data, get_all, update_date, \
+from src.utils.sqlite_utils import create_connection, create_table, insert_data, get_all, update_data, \
     get_not_evaluate_latest_weight, get_latest_weight
 
 
@@ -41,7 +41,7 @@ class TestSqliteUtils(TestCase):
         insert_data("a/b/c", 12, self.conn, 'test_table')
         data = get_all(self.conn, 'test_table')
         self.assertEqual(None, data[0].score)
-        update_date(1, 100, self.conn, 'test_table')
+        update_data(1, 100, self.conn, 'test_table')
         data = get_all(self.conn, 'test_table')
         self.assertEqual(100, data[0].score)
 
@@ -49,7 +49,7 @@ class TestSqliteUtils(TestCase):
         create_table(self.conn, 'test_table')
         insert_data("test1", 12, self.conn, 'test_table')
         insert_data("test2", 15, self.conn, 'test_table')
-        update_date(2, 100, self.conn, 'test_table')
+        update_data(2, 100, self.conn, 'test_table')
         data = get_not_evaluate_latest_weight(self.conn, 'test_table')
         self.assertEqual("test1", data.weight_file)
 
@@ -57,7 +57,7 @@ class TestSqliteUtils(TestCase):
         create_table(self.conn, 'test_table')
         insert_data("test1", 12, self.conn, 'test_table')
         insert_data("test2", 15, self.conn, 'test_table')
-        update_date(2, 100, self.conn, 'test_table')
+        update_data(2, 100, self.conn, 'test_table')
         data = get_latest_weight(self.conn, 'test_table')
         self.assertEqual("test2", data.weight_file)
 
