@@ -46,7 +46,7 @@ if __name__ == '__main__':
     agent.update_target_network()
 
     for i in range(episode):
-        logging.debug('----------episode', i, '------------')
+        logging.debug('----------episode {}------------'.format(i))
         observation = env.reset()
         done = False
         score = 0
@@ -57,7 +57,7 @@ if __name__ == '__main__':
             logging.debug(reward_function(score, reward, done))
             agent.take_reward(reward_function(score, reward, done), observation, done)
             agent.train_network(16, 1, 1, cer_mode=True)
-            agent.update_target_network(0.002)
+            agent.update_target_network(0.0002)
             agent.epsilon_greedy.decay(decay_value, 0.01)
         if i % 20 == 0:
             file_path = create_save_weight_file_path()
