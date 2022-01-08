@@ -22,7 +22,6 @@ if __name__ == '__main__':
     while True:
         db_conn = create_connection(DATABASE_NAME)
         last_save = get_not_evaluate_latest_weight(db_conn, table_name=TABLE_NAME)
-        db_conn.close()
         if last_save is not None:
             sleep_time = 0.2
             weight_file = last_save.weight_file
@@ -44,3 +43,4 @@ if __name__ == '__main__':
             print('------waiting for new save-------')
             time.sleep(sleep_time)
             sleep_time = min(sleep_time * 2, 2.5)
+        db_conn.close()
