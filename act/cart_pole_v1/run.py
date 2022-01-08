@@ -1,3 +1,5 @@
+import logging
+
 import gym
 import matplotlib.pyplot as plt
 from tensorflow.keras import losses
@@ -16,6 +18,9 @@ def reward_function(total_reward, current_reward, terminate):
     return current_reward
 
 
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
 if __name__ == '__main__':
     agent = DQN(1, 1, 200, 10000)
     optimizer_a = optimizers.Adam(learning_rate=0.0025)
@@ -31,7 +36,7 @@ if __name__ == '__main__':
     agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=0.5))
     episode = 1000
     env = gym.make('CartPole-v0')
-    print(env.reset())
+    logging.debug(env.reset())
     decay_value = 0.981
     db_conn = create_connection(DATABASE_NAME)
     create_table(db_conn, TABLE_NAME)
@@ -41,7 +46,7 @@ if __name__ == '__main__':
     agent.update_target_network()
 
     for i in range(episode):
-        print('----------episode', i, '------------')
+        logging.debug('----------episode', i, '------------')
         observation = env.reset()
         done = False
         score = 0
@@ -49,7 +54,7 @@ if __name__ == '__main__':
             action = agent.observe_on_training(observation)
             observation, reward, done, _ = env.step(action)
             score += reward
-            print(reward_function(score, reward, done))
+            logging.debug(reward_function(score, reward, done))
             agent.take_reward(reward_function(score, reward, done), observation, done)
             agent.train_network(16, 1, 1, cer_mode=True)
             agent.update_target_network(0.002)
