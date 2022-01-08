@@ -10,7 +10,7 @@ from src.dqn.dqn_model import DQN
 from src.utils.sqlite_utils import get_not_evaluate_latest_weight, create_connection, update_data
 
 if __name__ == '__main__':
-    sleep_time = 0.5
+    sleep_time = 0.2
     agent = DQN(1, 1, 200, 10000)
     optimizer = optimizers.Adam(learning_rate=0.0025)
     agent.training_network.add(Dense(16, activation='relu', input_shape=(4,)))
@@ -24,7 +24,7 @@ if __name__ == '__main__':
         last_save = get_not_evaluate_latest_weight(db_conn, table_name=TABLE_NAME)
         db_conn.close()
         if last_save is not None:
-            sleep_time = 0.5
+            sleep_time = 0.2
             weight_file = last_save.weight_file
             test_scores = list()
             print('start testing')
