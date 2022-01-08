@@ -3,7 +3,7 @@ from tensorflow.keras import losses
 from tensorflow.keras import optimizers
 from tensorflow.keras.layers import Dense
 
-from act.cart_pole_v1.run import DATABASE_NAME, TABLE_NAME
+from act.cart_pole_v1.constant import DATABASE_NAME, TABLE_NAME
 from src.dqn.dqn_model import DQN
 from src.utils.sqlite_utils import get_not_evaluate_latest_weight, create_connection, update_data
 
@@ -16,9 +16,10 @@ if __name__ == '__main__':
     agent.training_network.compile(optimizer=optimizer, loss=losses.Huber(delta=2.0))
     env = gym.make('CartPole-v0')
     episode = 10
-    db_conn = create_connection(DATABASE_NAME)
     while True:
+        db_conn = create_connection(DATABASE_NAME)
         last_save = get_not_evaluate_latest_weight(db_conn, table_name=TABLE_NAME)
+        db_conn.close()
         if last_save is not None:
             weight_file = last_save.weight_file
             test_scores = list()

@@ -4,12 +4,10 @@ from tensorflow.keras import losses
 from tensorflow.keras import optimizers
 from tensorflow.keras.layers import Dense
 
+from act.cart_pole_v1.constant import DATABASE_NAME, TABLE_NAME
 from src.dqn.dqn_model import DQN
 from src.utils.file_utils import create_save_weight_file_path
 from src.utils.sqlite_utils import create_connection, get_latest_weight, insert_data, create_table
-
-DATABASE_NAME = 'cart_pole_v1.db'
-TABLE_NAME = 'cart_pole_v1_save'
 
 
 def reward_function(total_reward, current_reward, terminate):
