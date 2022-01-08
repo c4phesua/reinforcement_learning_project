@@ -24,15 +24,14 @@ if __name__ == '__main__':
     agent.target_network.add(Dense(16, activation='relu', input_shape=(4,)))
     agent.target_network.add(Dense(16, activation='softmax'))
     agent.target_network.add(Dense(2, activation='linear'))
-    agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=2.0))
+    agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=0.5))
 
     optimizer_b = optimizers.Adam(learning_rate=0.0025)
     agent.training_network.add(Dense(16, activation='relu', input_shape=(4,)))
     agent.training_network.add(Dense(16, activation='softmax'))
     agent.training_network.add(Dense(2, activation='linear'))
-    agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=2.0))
-    agent.update_target_network()
-    episode = 90
+    agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=0.5))
+    episode = 1000
     env = gym.make('CartPole-v0')
     print(env.reset())
     decay_value = 0.981
@@ -41,6 +40,7 @@ if __name__ == '__main__':
     latest_save = get_latest_weight(db_conn, table_name=TABLE_NAME)
     if latest_save is not None:
         agent.training_network.load_weights(filepath=latest_save.weight_file)
+    agent.update_target_network()
 
     for i in range(episode):
         print('----------episode', i, '------------')
@@ -54,7 +54,7 @@ if __name__ == '__main__':
             print(reward_function(score, reward, done))
             agent.take_reward(reward_function(score, reward, done), observation, done)
             agent.train_network(16, 1, 1, cer_mode=True)
-            agent.update_target_network(0.02)
+            agent.update_target_network(0.002)
             agent.epsilon_greedy.decay(decay_value, 0.01)
         if i % 20 == 0:
             file_path = create_save_weight_file_path()
