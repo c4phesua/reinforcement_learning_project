@@ -17,7 +17,7 @@ logger.setLevel(logging.DEBUG)
 if __name__ == '__main__':
     sleep_time = 0.2
     agent = DQN(1, 1, 200, 10000)
-    optimizer = optimizers.Adadelta(learning_rate=0.1)
+    optimizer = optimizers.RMSprop(learning_rate=0.0025)
     agent.training_network.add(Dense(32, activation='relu', input_shape=(4,)))
     agent.training_network.add(Dense(16, activation='softmax'))
     agent.training_network.add(Dense(2, activation='linear'))

@@ -23,13 +23,13 @@ logger.setLevel(logging.DEBUG)
 
 if __name__ == '__main__':
     agent = DQN(0.98, 1, 600, 50000)
-    optimizer_a = optimizers.Adadelta(learning_rate=0.1)
+    optimizer_a = optimizers.RMSprop(learning_rate=0.0025)
     agent.target_network.add(Dense(32, activation='relu', input_shape=(4,)))
     agent.target_network.add(Dense(16, activation='softmax'))
     agent.target_network.add(Dense(2, activation='linear'))
     agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=2))
 
-    optimizer_b = optimizers.Adadelta(learning_rate=0.1)
+    optimizer_b = optimizers.RMSprop(learning_rate=0.0025)
     agent.training_network.add(Dense(32, activation='relu', input_shape=(4,)))
     agent.training_network.add(Dense(16, activation='softmax'))
     agent.training_network.add(Dense(2, activation='linear'))
