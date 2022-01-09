@@ -22,18 +22,18 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 if __name__ == '__main__':
-    agent = DQN(1, 1, 200, 10000)
-    optimizer_a = optimizers.Adam(learning_rate=0.0025)
-    agent.target_network.add(Dense(16, activation='relu', input_shape=(4,)))
+    agent = DQN(0.98, 1, 600, 50000)
+    optimizer_a = optimizers.Adam(learning_rate=0.0015)
+    agent.target_network.add(Dense(32, activation='relu', input_shape=(4,)))
     agent.target_network.add(Dense(16, activation='softmax'))
     agent.target_network.add(Dense(2, activation='linear'))
-    agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=0.5))
+    agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=2))
 
-    optimizer_b = optimizers.Adam(learning_rate=0.0025)
-    agent.training_network.add(Dense(16, activation='relu', input_shape=(4,)))
+    optimizer_b = optimizers.Adam(learning_rate=0.0015)
+    agent.training_network.add(Dense(32, activation='relu', input_shape=(4,)))
     agent.training_network.add(Dense(16, activation='softmax'))
     agent.training_network.add(Dense(2, activation='linear'))
-    agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=0.5))
+    agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=2))
     episode = 1000
     env = gym.make('CartPole-v0')
     logging.debug(env.reset())
@@ -56,7 +56,7 @@ if __name__ == '__main__':
             score += reward
             logging.debug(reward_function(score, reward, done))
             agent.take_reward(reward_function(score, reward, done), observation, done)
-            agent.train_network(16, 1, 1, cer_mode=True)
+            agent.train_network(512, 1, 1, cer_mode=True)
             agent.update_target_network(0.0002)
             agent.epsilon_greedy.decay(decay_value, 0.01)
         if i % 20 == 0:
