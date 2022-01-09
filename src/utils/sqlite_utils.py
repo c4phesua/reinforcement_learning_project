@@ -76,12 +76,12 @@ def get_all(conn: sqlite3.Connection, table_name) -> List[TrainingRecord]:
     return [TrainingRecord(data[0], data[1], data[2], data[3], data[4], data[5]) for data in rows]
 
 
-def get_not_evaluate_latest_weight(conn: sqlite3.Connection, table_name) -> Optional[TrainingRecord]:
+def get_not_evaluate_oldest_weight(conn: sqlite3.Connection, table_name) -> Optional[TrainingRecord]:
     cur = conn.cursor()
     sql_statement = f'''SELECT * 
                         FROM {table_name} 
                         WHERE evaluated IS NULL 
-                        ORDER BY id DESC LIMIT 1;'''
+                        ORDER BY id ASC LIMIT 1;'''
     cur.execute(sql_statement)
     data = cur.fetchone()
     if data is None:

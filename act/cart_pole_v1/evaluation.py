@@ -8,7 +8,7 @@ from tensorflow.keras.layers import Dense
 
 from act.cart_pole_v1.constant import DATABASE_NAME, TABLE_NAME
 from src.dqn.dqn_model import DQN
-from src.utils.sqlite_utils import get_not_evaluate_latest_weight, create_connection, update_data
+from src.utils.sqlite_utils import get_not_evaluate_oldest_weight, create_connection, update_data
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -17,16 +17,16 @@ logger.setLevel(logging.DEBUG)
 if __name__ == '__main__':
     sleep_time = 0.2
     agent = DQN(1, 1, 200, 10000)
-    optimizer = optimizers.Adam(learning_rate=0.0025)
-    agent.training_network.add(Dense(16, activation='relu', input_shape=(4,)))
+    optimizer = optimizers.Adam(learning_rate=0.0015)
+    agent.training_network.add(Dense(32, activation='relu', input_shape=(4,)))
     agent.training_network.add(Dense(16, activation='softmax'))
     agent.training_network.add(Dense(2, activation='linear'))
-    agent.training_network.compile(optimizer=optimizer, loss=losses.Huber(delta=2.0))
+    agent.training_network.compile(optimizer=optimizer, loss=losses.Huber(delta=2))
     env = gym.make('CartPole-v0')
     episode = 10
     while True:
         db_conn = create_connection(DATABASE_NAME)
-        last_save = get_not_evaluate_latest_weight(db_conn, table_name=TABLE_NAME)
+        last_save = get_not_evaluate_oldest_weight(db_conn, table_name=TABLE_NAME)
         if last_save is not None:
             sleep_time = 0.2
             weight_file = last_save.weight_file
