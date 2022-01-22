@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import pickle
 
 
 class ExperienceReplay:
@@ -29,3 +30,11 @@ class ExperienceReplay:
 
     def get_size(self):
         return len(self.memory)
+
+    def save(self, path):
+        with open(path, 'wb') as f:
+            pickle.dump(self.memory, f, pickle.HIGHEST_PROTOCOL)
+
+    def load(self, path):
+        with open(path, 'rb') as f:
+            self.memory = pickle.load(f)
