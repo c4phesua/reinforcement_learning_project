@@ -70,7 +70,7 @@ def update_data(record_id, score, conn: sqlite3.Connection, table_name) -> None:
 
 def get_all(conn: sqlite3.Connection, table_name) -> List[TrainingRecord]:
     cur = conn.cursor()
-    cur.execute(f"SELECT * FROM {table_name}")
+    cur.execute(f"SELECT * FROM {table_name} ORDER BY id ASC")
     rows = cur.fetchall()
     cur.close()
     return [TrainingRecord(data[0], data[1], data[2], data[3], data[4], data[5]) for data in rows]

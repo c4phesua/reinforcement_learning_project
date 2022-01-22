@@ -66,3 +66,13 @@ class TestSqliteUtils(TestCase):
         create_table(self.conn, 'test_table')
         data = get_all(self.conn, 'test_table')
         self.assertListEqual([], data)
+
+    def test_get_all_with_data(self):
+        create_table(self.conn, 'test_table')
+        insert_data("test1", 12, self.conn, 'test_table')
+        insert_data("test2", 15, self.conn, 'test_table')
+        insert_data("test3", 15, self.conn, 'test_table')
+        data = get_all(self.conn, 'test_table')
+        self.assertEqual(1, data[0].id)
+        self.assertEqual(2, data[1].id)
+        self.assertEqual(3, data[2].id)
