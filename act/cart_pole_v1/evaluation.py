@@ -9,10 +9,22 @@ from tensorflow.keras.layers import Dense
 from act.cart_pole_v1.constant import DATABASE_NAME, TABLE_NAME
 from src.dqn.dqn_model import DQN
 from src.utils.sqlite_utils import get_not_evaluate_oldest_weight, create_connection, update_data
+import tensorflow as tf
+
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-
 
 if __name__ == '__main__':
     sleep_time = 0.2
