@@ -73,7 +73,7 @@ if __name__ == '__main__':
             agent.train_network(512, 1, 1, cer_mode=True)
             agent.update_target_network(0.0002)
             agent.epsilon_greedy.decay(decay_value, 0.01)
-        if i % 20 == 0:
+        if i % 5 == 0:
             file_path = create_save_weight_file_path()
             agent.training_network.save_weights(filepath=file_path)
             insert_data(file_path, i, db_conn, TABLE_NAME)
