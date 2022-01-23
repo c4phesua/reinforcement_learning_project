@@ -12,6 +12,9 @@ from src.utils.file_utils import create_save_weight_file_path
 from src.utils.sqlite_utils import create_connection, get_latest_weight, insert_data, create_table
 import tensorflow as tf
 
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
     try:
@@ -19,10 +22,10 @@ if gpus:
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         logical_gpus = tf.config.list_logical_devices('GPU')
-        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+        logger.debug("{} Physical GPUs, {} Logical GPUs".format(len(gpus), len(logical_gpus)))
     except RuntimeError as e:
         # Memory growth must be set before GPUs have been initialized
-        print(e)
+        logger.debug(e)
 
 
 def reward_function(total_reward, current_reward, terminate):
@@ -30,9 +33,6 @@ def reward_function(total_reward, current_reward, terminate):
         return current_reward * -1
     return current_reward
 
-
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
 
 if __name__ == '__main__':
     agent = DQN(0.9, 1, 600, 70000)

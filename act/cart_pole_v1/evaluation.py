@@ -11,6 +11,9 @@ from src.dqn.dqn_model import DQN
 from src.utils.sqlite_utils import get_not_evaluate_oldest_weight, create_connection, update_data
 import tensorflow as tf
 
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
     try:
@@ -18,13 +21,10 @@ if gpus:
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         logical_gpus = tf.config.list_logical_devices('GPU')
-        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+        logger.debug("{} Physical GPUs, {} Logical GPUs".format(len(gpus), len(logical_gpus)))
     except RuntimeError as e:
         # Memory growth must be set before GPUs have been initialized
-        print(e)
-
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+        logger.debug(e)
 
 if __name__ == '__main__':
     sleep_time = 0.2
