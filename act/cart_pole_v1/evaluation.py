@@ -18,8 +18,8 @@ if __name__ == '__main__':
     sleep_time = 0.2
     agent = DQN(1, 1, 200, 10000)
     optimizer = optimizers.RMSprop(learning_rate=0.025)
-    agent.training_network.add(Dense(32, activation='relu', input_shape=(4,)))
-    agent.training_network.add(Dense(16, activation='softmax'))
+    agent.training_network.add(Dense(64, activation='relu', input_shape=(4,)))
+    agent.training_network.add(Dense(32, activation='softmax'))
     agent.training_network.add(Dense(2, activation='linear'))
     agent.training_network.compile(optimizer=optimizer, loss=losses.Huber(delta=2))
     env = gym.make('CartPole-v0')

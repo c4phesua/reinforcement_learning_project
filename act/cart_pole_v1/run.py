@@ -6,7 +6,7 @@ from tensorflow.keras import losses
 from tensorflow.keras import optimizers
 from tensorflow.keras.layers import Dense
 
-from act.cart_pole_v1.constant import DATABASE_NAME, TABLE_NAME
+from act.cart_pole_v1.constant import DATABASE_NAME, TABLE_NAME, EXPERIENCE_REPLAY_SAVE
 from src.dqn.dqn_model import DQN
 from src.utils.file_utils import create_save_weight_file_path
 from src.utils.sqlite_utils import create_connection, get_latest_weight, insert_data, create_table
@@ -22,16 +22,16 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
 if __name__ == '__main__':
-    agent = DQN(0.98, 1, 600, 50000)
-    optimizer_a = optimizers.RMSprop(learning_rate=0.025)
-    agent.target_network.add(Dense(32, activation='relu', input_shape=(4,)))
-    agent.target_network.add(Dense(16, activation='softmax'))
+    agent = DQN(0.9, 1, 600, 70000)
+    optimizer_a = optimizers.RMSprop(learning_rate=0.0001, rho=0.99)
+    agent.target_network.add(Dense(64, activation='relu', input_shape=(4,)))
+    agent.target_network.add(Dense(32, activation='softmax'))
     agent.target_network.add(Dense(2, activation='linear'))
     agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=2))
 
-    optimizer_b = optimizers.RMSprop(learning_rate=0.025)
-    agent.training_network.add(Dense(32, activation='relu', input_shape=(4,)))
-    agent.training_network.add(Dense(16, activation='softmax'))
+    optimizer_b = optimizers.RMSprop(learning_rate=0.0001, rho=0.99)
+    agent.training_network.add(Dense(64, activation='relu', input_shape=(4,)))
+    agent.training_network.add(Dense(32, activation='softmax'))
     agent.training_network.add(Dense(2, activation='linear'))
     agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=2))
     episode = 1000
@@ -43,6 +43,7 @@ if __name__ == '__main__':
     latest_save = get_latest_weight(db_conn, table_name=TABLE_NAME)
     if latest_save is not None:
         agent.training_network.load_weights(filepath=latest_save.weight_file)
+        agent.exp_replay.load(EXPERIENCE_REPLAY_SAVE)
     agent.update_target_network()
 
     for i in range(episode):
@@ -63,5 +64,6 @@ if __name__ == '__main__':
             file_path = create_save_weight_file_path()
             agent.training_network.save_weights(filepath=file_path)
             insert_data(file_path, i, db_conn, TABLE_NAME)
+            agent.exp_replay.save(EXPERIENCE_REPLAY_SAVE)
     plt.show()
     db_conn.close()
