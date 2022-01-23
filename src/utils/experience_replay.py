@@ -1,6 +1,11 @@
+import logging
+
 import numpy as np
 import random
 import pickle
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 
 
 class ExperienceReplay:
@@ -38,3 +43,4 @@ class ExperienceReplay:
     def load(self, path):
         with open(path, 'rb') as f:
             self.memory = pickle.load(f)
+            logging.debug('load to memory, current size is {}'.format(len(self.memory)))
