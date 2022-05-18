@@ -1,4 +1,4 @@
-from src.dqn.baseModel import BaseModel
+from src.interfaces.dqn import BaseModel
 from src.utils.epsilon_greedy import EpsilonGreedy
 from src.utils.experience_replay import ExperienceReplay
 from tensorflow.keras import Sequential
@@ -38,7 +38,8 @@ class DQN(BaseModel):
             # state_samples, action_samples, reward_samples, next_state_samples, done_samples
             s_batch, a_batch, r_batch, ns_batch, done_batch = self.exp_replay.sample_experience(sample_size, cer_mode)
             states, q_values = self.replay(s_batch, a_batch, r_batch, ns_batch, done_batch)
-            history = self.training_network.fit(states, q_values, epochs=epochs, batch_size=batch_size, verbose=verbose)
+            history = self.training_network.fit(x=states, y=q_values, epochs=epochs, batch_size=batch_size,
+                                                verbose=verbose)
             return history.history['loss']
 
     def replay(self, states, actions, rewards, next_states, terminals):
