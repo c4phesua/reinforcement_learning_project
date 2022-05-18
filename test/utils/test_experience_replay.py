@@ -44,3 +44,22 @@ class TestExperienceReplay(TestCase):
         np.testing.assert_array_equal(expected_r_batch, r_batch)
         np.testing.assert_array_equal(expected_ns_batch, ns_batch)
         np.testing.assert_array_equal(expected_done_batch, done_batch)
+
+    def test_sample_experience_cer_mode(self):
+        random.seed(0)
+        experience_replay = ExperienceReplay(e_max=4)
+        experience_replay.add_experience([1, 2, 3, 4, 5])
+        experience_replay.add_experience([6, 7, 8, 9, 10])
+        experience_replay.add_experience([11, 12, 13, 14, 15])
+        experience_replay.add_experience([16, 17, 18, 19, 20])
+        s_batch, a_batch, r_batch, ns_batch, done_batch = experience_replay.sample_experience(3, cer_mode=True)
+        expected_s_batch = [16, 6, 1, 16]
+        expected_a_batch = [17, 7, 2, 17]
+        expected_r_batch = [18, 8, 3, 18]
+        expected_ns_batch = [19, 9, 4, 19]
+        expected_done_batch = [20, 10, 5, 20]
+        np.testing.assert_array_equal(expected_s_batch, s_batch)
+        np.testing.assert_array_equal(expected_a_batch, a_batch)
+        np.testing.assert_array_equal(expected_r_batch, r_batch)
+        np.testing.assert_array_equal(expected_ns_batch, ns_batch)
+        np.testing.assert_array_equal(expected_done_batch, done_batch)
