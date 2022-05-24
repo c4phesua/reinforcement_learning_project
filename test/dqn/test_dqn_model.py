@@ -99,3 +99,25 @@ class TestDqnModel(TestCase):
         for i in range(4):
             predicted = model.target_network.predict(np.array([states[i]]))
             np.testing.assert_array_almost_equal(q_values[i], predicted.ravel())
+
+    def test_update_network(self):
+        model = DQN(0.1, 0.5, 100, 1000)
+        optimizer_1 = optimizers.RMSprop(learning_rate=0.0001, rho=0.99)
+        optimizer_2 = optimizers.RMSprop(learning_rate=0.0001, rho=0.99)
+        model.target_network.add(Dense(2, activation='relu', input_shape=(2,)))
+        model.target_network.compile(optimizer=optimizer_1, loss=losses.Huber(delta=2))
+        model.training_network.add(Dense(2, activation='relu', input_shape=(2,)))
+        model.training_network.compile(optimizer=optimizer_2, loss=losses.Huber(delta=2))
+        model.training_network.set_weights([np.array([[-0.3963518, 0.09354186],
+                                                      [-0.17520237, -0.15401125]], dtype=np.float32),
+                                            np.array([2., 3.], dtype=np.float32)])
+        model.target_network.set_weights([np.array([[-0.6971593, 0.51061773],
+                                                    [0.05257487, -0.02054429]], dtype=np.float32),
+                                          np.array([1., 2.], dtype=np.float32)])
+        model.update_target_network(0.2)
+        # 0.2 0.8
+        expected = [np.array([[-0.6369978, 0.427202556],
+                              [0.00701942, -0.047237682]], dtype=np.float32),
+                    np.array([1.2, 2.2], dtype=np.float32)]
+        for i in range(len(expected)):
+            np.testing.assert_array_almost_equal(expected[i], model.target_network.get_weights()[i])
