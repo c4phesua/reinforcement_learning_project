@@ -59,6 +59,9 @@ class DQN(BaseModel):
         if tau is None:
             self.target_network.set_weights(self.training_network.get_weights())
         else:
-            target_weight = np.array(self.training_network.get_weights(), dtype="object") * tau + (1 - tau) * \
-                            np.array(self.target_network.get_weights(), dtype="object")
-            self.target_network.set_weights(target_weight)
+            updated_weights = list()
+            for i in range(len(self.training_network.get_weights())):
+                target_weight = self.training_network.get_weights()[i] * tau + \
+                                self.target_network.get_weights()[i] * (1 - tau)
+                updated_weights.append(target_weight)
+            self.target_network.set_weights(updated_weights)
