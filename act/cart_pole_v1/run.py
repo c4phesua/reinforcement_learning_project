@@ -36,15 +36,15 @@ def reward_function(total_reward, current_reward, terminate):
 
 if __name__ == '__main__':
     agent = DQN(0.9, 1, 600, 70000)
-    optimizer_a = optimizers.RMSprop(learning_rate=0.0001, rho=0.99)
-    agent.target_network.add(Dense(64, activation='relu', input_shape=(4,)))
-    agent.target_network.add(Dense(32, activation='softmax'))
+    optimizer_a = optimizers.RMSprop(learning_rate=0.00005, rho=0.99)
+    agent.target_network.add(Dense(10, activation='relu', input_shape=(4,)))
+    agent.target_network.add(Dense(10, activation='relu'))
     agent.target_network.add(Dense(2, activation='linear'))
     agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=2))
 
-    optimizer_b = optimizers.RMSprop(learning_rate=0.0001, rho=0.99)
-    agent.training_network.add(Dense(64, activation='relu', input_shape=(4,)))
-    agent.training_network.add(Dense(32, activation='softmax'))
+    optimizer_b = optimizers.RMSprop(learning_rate=0.00005, rho=0.99)
+    agent.training_network.add(Dense(10, activation='relu', input_shape=(4,)))
+    agent.training_network.add(Dense(10, activation='relu'))
     agent.training_network.add(Dense(2, activation='linear'))
     agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=2))
     episode = 1000
@@ -71,7 +71,7 @@ if __name__ == '__main__':
             logging.debug(reward_function(score, reward, done))
             agent.take_reward(reward_function(score, reward, done), observation, done)
             agent.train_network(512, 1, 1, cer_mode=True)
-            agent.update_target_network(0.0002)
+            agent.update_target_network(0.005)
             agent.epsilon_greedy.decay(decay_value, 0.01)
         if i % 5 == 0:
             file_path = create_save_weight_file_path()
