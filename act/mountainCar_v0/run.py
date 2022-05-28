@@ -1,11 +1,16 @@
+import json
 import logging
+import pickle
+from uuid import uuid4
 
 import gym
 from matplotlib import pyplot as plt
 from tensorflow.keras.layers import Dense
 from tensorflow.keras import optimizers, losses
 
+from act.mountainCar_v0.constant import EVALUATION_QUEUE_NAME, PROFILE_NAME
 from src.dqn.dqn_model import DQN
+from src.utils.rabbitmq_utils import send_message, create_evaluate_request, create_queue
 
 
 def reward_function(coins, state, done):
@@ -64,6 +69,9 @@ if __name__ == '__main__':
     decay_value = 0.981
     agent.update_target_network()
 
+    create_queue(EVALUATION_QUEUE_NAME)
+    batch_id = str(uuid4())
+
     for i in range(episode):
         logging.debug('----------episode {}------------'.format(i))
         observation = env.reset()
@@ -80,4 +88,8 @@ if __name__ == '__main__':
             agent.train_network(64, 1, 1, cer_mode=True)
             agent.update_target_network(0.0002)
             agent.epsilon_greedy.decay(decay_value, 0.01)
+        send_message(EVALUATION_QUEUE_NAME,
+                     message=json.dumps(create_evaluate_request(PROFILE_NAME, batch_id, i,
+                                                                pickle.dumps(
+                                                                    agent.training_network.get_weights()).hex())))
     plt.show()
