@@ -26,7 +26,8 @@ def send_message(queue_name: str, message):
 def start_consumer(queue_name: str, callback_function):
     with open_connection() as connection:
         channel = connection.channel()
-        channel.basic_consume(queue=queue_name, on_message_callback=callback_function, auto_ack=True)
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(queue=queue_name, on_message_callback=callback_function, auto_ack=False)
         logging.debug(' [*] Waiting for messages. To exit press CTRL+C')
         channel.start_consuming()
 
