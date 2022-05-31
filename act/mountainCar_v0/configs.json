@@ -1,17 +1,16 @@
 {
-  "discount_factor": 0.9,
+  "discount_factor": 0.99,
   "epsilon": 1,
-  "e_min": 100,
+  "e_min": 200,
   "e_max": 70000,
-  "decay_value": 0.981,
-  "min_epsilon": 0.01,
-  "tau": 0.0002,
-  "total_episode": 1000,
+  "decay_value": 0.99,
+  "min_epsilon": 0.001,
+  "tau": 0.001,
+  "total_episode": 4000,
   "batch_size": 64,
   "optimizer": {
-    "name": "RMSprop",
-    "learning_rate": 0.0001,
-    "rho": 0.99
+    "name": "Adam",
+    "learning_rate": 0.000025
   },
   "loss_func": {
     "name": "huber",
