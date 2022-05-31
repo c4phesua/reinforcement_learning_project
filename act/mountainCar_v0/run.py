@@ -1,16 +1,19 @@
 import json
 import logging
 import pickle
-from uuid import uuid4
 
 import gym
 from matplotlib import pyplot as plt
-from tensorflow.keras.layers import Dense
 from tensorflow.keras import optimizers, losses
+from tensorflow.keras.layers import Dense
 
 from act.mountainCar_v0.constant import EVALUATION_QUEUE_NAME, PROFILE_NAME
 from src.dqn.dqn_model import DQN
+from src.utils.file_utils import load_json_file
+from src.utils.mongodb_utils import create_new_batch, insert_loss
 from src.utils.rabbitmq_utils import send_message, create_evaluate_request, create_queue
+
+configs = load_json_file('configs.json')
 
 
 def reward_function(coins, state, done):
@@ -51,26 +54,28 @@ def reward_function(coins, state, done):
 
 
 if __name__ == '__main__':
-    agent = DQN(0.9, 1, 100, 70000)
-    optimizer_a = optimizers.RMSprop(learning_rate=0.0001, rho=0.99)
+    agent = DQN(configs['discount_factor'], configs['epsilon'], configs['e_min'], configs['e_max'])
+    optimizer_a = optimizers.RMSprop(learning_rate=configs['optimizer']['learning_rate'],
+                                     rho=configs['optimizer']['rho'])
     agent.target_network.add(Dense(8, activation='relu', input_shape=(2,)))
     agent.target_network.add(Dense(24, activation='softmax'))
     agent.target_network.add(Dense(2, activation='linear'))
     agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=2))
 
-    optimizer_b = optimizers.RMSprop(learning_rate=0.0001, rho=0.99)
+    optimizer_b = optimizers.RMSprop(learning_rate=configs['optimizer']['learning_rate'],
+                                     rho=configs['optimizer']['rho'])
     agent.training_network.add(Dense(8, activation='relu', input_shape=(2,)))
     agent.training_network.add(Dense(24, activation='softmax'))
     agent.training_network.add(Dense(2, activation='linear'))
     agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=2))
-    episode = 1000
+    episode = configs['total_episode']
     env = gym.make('MountainCar-v0')
     logging.debug(env.reset())
-    decay_value = 0.981
+    decay_value = configs['decay_value']
     agent.update_target_network()
 
     create_queue(EVALUATION_QUEUE_NAME)
-    batch_id = str(uuid4())
+    batch_id = create_new_batch(PROFILE_NAME, configs)
 
     for i in range(episode):
         logging.debug('----------episode {}------------'.format(i))
@@ -85,9 +90,11 @@ if __name__ == '__main__':
             score += reward
             logging.debug((observation, reward_function(coins_arr, observation, done), done, coins_arr))
             agent.take_reward(reward_function(coins_arr, observation, done), observation, done)
-            agent.train_network(64, 1, 1, cer_mode=True)
-            agent.update_target_network(0.0002)
-            agent.epsilon_greedy.decay(decay_value, 0.01)
+            log = agent.train_network(configs['batch_size'], 1, 1, cer_mode=True)
+            if log:
+                insert_loss(PROFILE_NAME, batch_id, log[0])
+            agent.update_target_network(configs['tau'])
+            agent.epsilon_greedy.decay(decay_value, configs['min_epsilon'])
         send_message(EVALUATION_QUEUE_NAME,
                      message=json.dumps(create_evaluate_request(PROFILE_NAME, batch_id, i,
                                                                 pickle.dumps(
