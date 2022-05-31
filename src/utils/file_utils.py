@@ -1,3 +1,4 @@
+import json
 import os
 import uuid
 from datetime import datetime
@@ -24,3 +25,8 @@ def create_unique_file_name():
 
 def create_save_weight_file_path():
     return os.path.join(get_weights_folder_path(), create_unique_file_name() + '.h5')
+
+
+def load_json_file(file_path) -> dict:
+    with open(file_path) as f:
+        return json.load(f)

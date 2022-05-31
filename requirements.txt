@@ -8,3 +8,4 @@ numpy~=1.21.4
 
 pyglet==1.5.26
 python-dotenv~=0.20.0
+pymongo~=4.1.1
