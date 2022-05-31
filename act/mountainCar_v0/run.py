@@ -59,18 +59,19 @@ if __name__ == '__main__':
     agent.target_network.add(Dense(64, activation='elu', input_shape=(2,)))
     agent.target_network.add(Dense(32, activation='elu'))
     agent.target_network.add(Dense(3, activation='elu'))
-    agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=1))
+    agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=configs['loss_func']['delta']))
 
     optimizer_b = optimizers.Adam(learning_rate=configs['optimizer']['learning_rate'])
     agent.training_network.add(Dense(64, activation='elu', input_shape=(2,)))
     agent.training_network.add(Dense(32, activation='elu'))
     agent.training_network.add(Dense(3, activation='elu'))
-    agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=1))
+    agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=configs['loss_func']['delta']))
     episode = configs['total_episode']
     env = gym.make('MountainCar-v0')
     logging.debug(env.reset())
     decay_value = configs['decay_value']
     agent.update_target_network()
+    configs['net'] = agent.training_network.to_json()
 
     create_queue(EVALUATION_QUEUE_NAME)
     batch_id = create_new_batch(PROFILE_NAME, configs)
