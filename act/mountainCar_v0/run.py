@@ -71,6 +71,7 @@ if __name__ == '__main__':
     logging.debug(env.reset())
     decay_value = configs['decay_value']
     agent.update_target_network()
+    configs['net'] = agent.training_network.to_json()
 
     create_queue(EVALUATION_QUEUE_NAME)
     batch_id = create_new_batch(PROFILE_NAME, configs)
