@@ -17,57 +17,55 @@ configs = load_json_file('configs.json')
 
 
 def reward_function(coins, state, done):
-    result = 0
-    if done and state[0] >= 0.6:
+    result = -1
+    if done and state[0] >= 0.5:
         return 2
     elif -0.5 < state[0] < -0.4:
         result = coins[0]
-        coins[0] = 0
+        coins[0] = -1
     elif -0.4 < state[0] < -0.3:
         result = coins[1]
-        coins[1] = 0
+        coins[1] = -1
     elif -0.3 < state[0] < -0.2:
         result = coins[2]
-        coins[2] = 0
+        coins[2] = -1
     elif -0.2 < state[0] < -0.1:
         result = coins[3]
-        coins[3] = 0
+        coins[3] = -1
     elif -0.1 < state[0] < 0:
         result = coins[4]
-        coins[4] = 0
+        coins[4] = -1
     elif 0 < state[0] < 0.1:
         result = coins[5]
-        coins[5] = 0
+        coins[5] = -1
     elif 0.1 < state[0] < 0.2:
         result = coins[6]
-        coins[6] = 0
+        coins[6] = -1
     elif 0.2 < state[0] < 0.3:
         result = coins[7]
-        coins[7] = 0
+        coins[7] = -1
     elif 0.3 < state[0] < 0.4:
         result = coins[8]
-        coins[8] = 0
+        coins[8] = -1
     elif 0.4 < state[0] < 0.5:
         result = coins[9]
-        coins[9] = 0
+        coins[9] = -1
     return result
 
 
 if __name__ == '__main__':
     agent = DQN(configs['discount_factor'], configs['epsilon'], configs['e_min'], configs['e_max'])
-    optimizer_a = optimizers.RMSprop(learning_rate=configs['optimizer']['learning_rate'],
-                                     rho=configs['optimizer']['rho'])
-    agent.target_network.add(Dense(8, activation='relu', input_shape=(2,)))
-    agent.target_network.add(Dense(24, activation='softmax'))
-    agent.target_network.add(Dense(2, activation='linear'))
-    agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=2))
+    optimizer_a = optimizers.Adam(learning_rate=configs['optimizer']['learning_rate'])
+    agent.target_network.add(Dense(64, activation='elu', input_shape=(2,)))
+    agent.target_network.add(Dense(32, activation='elu'))
+    agent.target_network.add(Dense(3, activation='elu'))
+    agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=1))
 
-    optimizer_b = optimizers.RMSprop(learning_rate=configs['optimizer']['learning_rate'],
-                                     rho=configs['optimizer']['rho'])
-    agent.training_network.add(Dense(8, activation='relu', input_shape=(2,)))
-    agent.training_network.add(Dense(24, activation='softmax'))
-    agent.training_network.add(Dense(2, activation='linear'))
-    agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=2))
+    optimizer_b = optimizers.Adam(learning_rate=configs['optimizer']['learning_rate'])
+    agent.training_network.add(Dense(64, activation='elu', input_shape=(2,)))
+    agent.training_network.add(Dense(32, activation='elu'))
+    agent.training_network.add(Dense(3, activation='elu'))
+    agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=1))
     episode = configs['total_episode']
     env = gym.make('MountainCar-v0')
     logging.debug(env.reset())
