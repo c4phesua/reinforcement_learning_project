@@ -37,7 +37,7 @@ def create_new_batch(collection_name: str, configs: dict):
     return batch_id
 
 
-def insert_evaluation_record(collection_name: str, batch_id, episode, current_weights, score):
+def insert_evaluation_record(collection_name: str, batch_id: str, episode, current_weights, score):
     collections = client[DB_NAME]
     record = {
         "episode": episode,
@@ -49,5 +49,8 @@ def insert_evaluation_record(collection_name: str, batch_id, episode, current_we
                                                    {'$push': {'training_data.evaluate_records': record}})
 
 
-if __name__ == '__main__':
-    insert_evaluation_record("mountainTest", "e1fc6b87-db95-4c63-9191-32d679bca0d4", 1, 123, 100)
+def get_loss_report(collection_name: str, batch_id: str):
+    collections = client[DB_NAME]
+    query = {'batch_id': batch_id}
+    return collections[collection_name].find_one(query, {'training_data.losses': 1})['training_data']['losses']
+
