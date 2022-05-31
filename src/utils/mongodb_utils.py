@@ -1,5 +1,6 @@
 import datetime
 import os
+from typing import List
 from uuid import uuid4
 
 from dotenv import load_dotenv
@@ -49,7 +50,7 @@ def insert_evaluation_record(collection_name: str, batch_id: str, episode, curre
                                                    {'$push': {'training_data.evaluate_records': record}})
 
 
-def get_loss_report(collection_name: str, batch_id: str):
+def get_loss_report(collection_name: str, batch_id: str) -> List:
     collections = client[DB_NAME]
     query = {'batch_id': batch_id}
     return collections[collection_name].find_one(query, {'training_data.losses': 1})['training_data']['losses']
