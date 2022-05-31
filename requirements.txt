@@ -6,3 +6,4 @@ matplotlib~=3.5.0
 pika==1.2.1
 numpy~=1.21.4
 python-dotenv~=0.20.0
+pymongo~=4.1.1
