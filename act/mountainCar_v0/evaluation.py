@@ -28,7 +28,7 @@ def evaluation_function(ch, method, properties, body):
     logging.debug('----------episode {}------------'.format(json_body['episode']))
     avg_score = 0
     try:
-        for i in range(10):
+        for i in range(2):
             logging.debug('----------Test {}------------'.format(i))
             observation = env.reset()
             done = False
