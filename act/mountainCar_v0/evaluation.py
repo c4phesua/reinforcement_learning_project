@@ -27,8 +27,9 @@ def evaluation_function(ch, method, properties, body):
     agent.training_network.set_weights(pickle.loads(bytes.fromhex(json_body['model_weights'])))
     logging.debug('----------episode {}------------'.format(json_body['episode']))
     avg_score = 0
+    total_trial = 2
     try:
-        for i in range(2):
+        for i in range(total_trial):
             logging.debug('----------Test {}------------'.format(i))
             observation = env.reset()
             done = False
@@ -38,7 +39,7 @@ def evaluation_function(ch, method, properties, body):
                 observation, reward, done, _ = env.step(action)
                 score += reward
                 # env.render()
-            avg_score += score / 10.0
+            avg_score += score / float(total_trial)
         logging.debug(f'------avg score = {avg_score}-----------')
         insert_evaluation_record(PROFILE_NAME, json_body['batch_id'], json_body['episode'], json_body['model_weights'],
                                  avg_score)
