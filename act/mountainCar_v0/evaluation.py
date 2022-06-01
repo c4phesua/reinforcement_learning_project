@@ -14,6 +14,7 @@ from src.utils.rabbitmq_utils import start_consumer
 
 env = gym.make('MountainCar-v0')
 configs = load_json_file('configs.json')
+mongo_client = get_mongo_client()
 
 
 def evaluation_function(ch, method, properties, body):
@@ -28,7 +29,6 @@ def evaluation_function(ch, method, properties, body):
     logging.debug('----------episode {}------------'.format(json_body['episode']))
     avg_score = 0
     total_trial = 2
-    mongo_client = get_mongo_client()
     try:
         for i in range(total_trial):
             logging.debug('----------Test {}------------'.format(i))
