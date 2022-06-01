@@ -11,8 +11,8 @@ from act.mountainCar_v0.constant import EVALUATION_QUEUE_NAME, PROFILE_NAME
 from src.clients.loss_writing_client import LossWritingClient
 from src.dqn.dqn_model import DQN
 from src.utils.file_utils import load_json_file
-from src.utils.mongodb_utils import create_new_batch
-from src.utils.rabbitmq_utils import send_message, create_evaluate_request, create_queue
+from src.utils.mongodb_utils import create_new_batch, get_mongo_client
+from src.utils.rabbitmq_utils import send_message, create_evaluate_request
 
 configs = load_json_file('configs.json')
 
@@ -75,7 +75,8 @@ if __name__ == '__main__':
     configs['net'] = agent.training_network.to_json()
 
     # create_queue(EVALUATION_QUEUE_NAME)
-    batch_id = create_new_batch(PROFILE_NAME, configs)
+    mongo_client = get_mongo_client()
+    batch_id = create_new_batch(PROFILE_NAME, configs, mongo_client)
     loss_writing_queue = Queue()
     loss_writing_client = LossWritingClient(loss_writing_queue)
     loss_writing_client.start()

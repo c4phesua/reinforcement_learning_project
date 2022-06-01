@@ -8,12 +8,15 @@ from pymongo import MongoClient
 
 load_dotenv()
 
-client = MongoClient(os.getenv('MONGODB_CONNECTION_STRING'))
+
+def get_mongo_client():
+    return MongoClient(os.getenv('MONGODB_CONNECTION_STRING'))
+
 
 DB_NAME = "reinforcement_learning_project"
 
 
-def insert_loss(collection_name: str, batch_id: str, loss):
+def insert_loss(collection_name: str, batch_id: str, loss, client: MongoClient):
     collections = client[DB_NAME]
     record = {
         'loss': loss,
@@ -22,7 +25,7 @@ def insert_loss(collection_name: str, batch_id: str, loss):
     return collections[collection_name].update_one({'batch_id': batch_id}, {'$push': {'training_data.losses': record}})
 
 
-def create_new_batch(collection_name: str, configs: dict):
+def create_new_batch(collection_name: str, configs: dict, client: MongoClient):
     collections = client[DB_NAME]
     batch_id = str(uuid4())
     new_docs = {
@@ -38,7 +41,7 @@ def create_new_batch(collection_name: str, configs: dict):
     return batch_id
 
 
-def insert_evaluation_record(collection_name: str, batch_id: str, episode, current_weights, score):
+def insert_evaluation_record(collection_name: str, batch_id: str, episode, current_weights, score, client: MongoClient):
     collections = client[DB_NAME]
     record = {
         "episode": episode,
@@ -50,8 +53,7 @@ def insert_evaluation_record(collection_name: str, batch_id: str, episode, curre
                                                    {'$push': {'training_data.evaluate_records': record}})
 
 
-def get_loss_report(collection_name: str, batch_id: str) -> List:
+def get_loss_report(collection_name: str, batch_id: str, client: MongoClient) -> List:
     collections = client[DB_NAME]
     query = {'batch_id': batch_id}
     return collections[collection_name].find_one(query, {'training_data.losses': 1})['training_data']['losses']
-
