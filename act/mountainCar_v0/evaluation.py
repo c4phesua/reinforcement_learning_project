@@ -9,7 +9,7 @@ from tensorflow.keras.layers import Dense
 from act.mountainCar_v0.constant import EVALUATION_QUEUE_NAME, PROFILE_NAME
 from src.dqn.dqn_model import DQN
 from src.utils.file_utils import load_json_file
-from src.repositories.mongodb_utils import insert_evaluation_record, get_mongo_client
+from src.repositories.mongodb_repo import insert_evaluation_record, get_mongo_client
 from src.utils.rabbitmq_utils import start_consumer
 
 env = gym.make('MountainCar-v0')

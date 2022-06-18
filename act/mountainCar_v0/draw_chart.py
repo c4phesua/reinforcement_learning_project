@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 
 from act.mountainCar_v0.constant import PROFILE_NAME
-from src.repositories.mongodb_utils import get_mongo_client, get_evaluate_report
+from src.repositories.mongodb_repo import get_mongo_client, get_evaluate_report
 
 if __name__ == '__main__':
     mongo_client = get_mongo_client()
