@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 from act.cart_pole_v1.constant import DATABASE_NAME, TABLE_NAME
-from src.utils.sqlite_utils import create_connection, get_all
+from src.repositories.sqlite_utils import create_connection, get_all
 
 if __name__ == '__main__':
     db_conn = create_connection(DATABASE_NAME)

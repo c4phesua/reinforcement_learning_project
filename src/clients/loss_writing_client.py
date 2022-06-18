@@ -1,6 +1,6 @@
 from multiprocessing import Process, Queue
 
-from src.utils.mongodb_utils import insert_loss, get_mongo_client
+from src.repositories.mongodb_utils import insert_loss, get_mongo_client
 
 
 class LossWritingClient(Process):

@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from src.utils.sqlite_utils import create_connection, create_table, insert_data, get_all, update_data, \
+from src.repositories.sqlite_utils import create_connection, create_table, insert_data, get_all, update_data, \
     get_not_evaluate_oldest_weight, get_latest_weight
 
 

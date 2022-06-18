@@ -8,7 +8,7 @@ from tensorflow.keras.layers import Dense
 
 from act.cart_pole_v1.constant import DATABASE_NAME, TABLE_NAME
 from src.dqn.dqn_model import DQN
-from src.utils.sqlite_utils import get_not_evaluate_oldest_weight, create_connection, update_data
+from src.repositories.sqlite_utils import get_not_evaluate_oldest_weight, create_connection, update_data
 import tensorflow as tf
 
 logger = logging.getLogger()

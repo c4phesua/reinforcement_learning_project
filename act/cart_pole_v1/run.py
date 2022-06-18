@@ -9,7 +9,7 @@ from tensorflow.keras.layers import Dense
 from act.cart_pole_v1.constant import DATABASE_NAME, TABLE_NAME, EXPERIENCE_REPLAY_SAVE
 from src.dqn.dqn_model import DQN
 from src.utils.file_utils import create_save_weight_file_path
-from src.utils.sqlite_utils import create_connection, get_latest_weight, insert_data, create_table
+from src.repositories.sqlite_utils import create_connection, get_latest_weight, insert_data, create_table
 import tensorflow as tf
 
 logger = logging.getLogger()
