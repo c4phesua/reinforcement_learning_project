@@ -57,3 +57,9 @@ def get_loss_report(collection_name: str, batch_id: str, client: MongoClient) ->
     collections = client[DB_NAME]
     query = {'batch_id': batch_id}
     return collections[collection_name].find_one(query, {'training_data.losses': 1})['training_data']['losses']
+
+
+def get_evaluate_report(collection_name: str, batch_id: str, client: MongoClient) -> List:
+    collections = client[DB_NAME]
+    query = {'batch_id': batch_id}
+    return collections[collection_name].find_one(query, {'training_data.evaluate_records': 1})['training_data']['evaluate_records']
