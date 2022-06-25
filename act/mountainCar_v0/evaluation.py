@@ -9,12 +9,11 @@ from tensorflow.keras.layers import Dense
 from act.mountainCar_v0.constant import EVALUATION_QUEUE_NAME, PROFILE_NAME
 from src.dqn.dqn_model import DQN
 from src.utils.file_utils import load_json_file
-from src.repositories.mongodb_repo import insert_evaluation_record, get_mongo_client
+from src.repositories.cassandra_repo import insert_evaluation
 from src.utils.rabbitmq_utils import start_consumer
 
 env = gym.make('MountainCar-v0')
 configs = load_json_file('configs.json')
-mongo_client = get_mongo_client()
 
 
 def evaluation_function(ch, method, properties, body):
@@ -42,8 +41,8 @@ def evaluation_function(ch, method, properties, body):
                 # env.render()
             avg_score += score / float(total_trial)
         logging.debug(f'------avg score = {avg_score}-----------')
-        insert_evaluation_record(PROFILE_NAME, json_body['batch_id'], json_body['episode'], json_body['model_weights'],
-                                 avg_score, mongo_client)
+        insert_evaluation(PROFILE_NAME, json_body['batch_id'], json_body['episode'], json_body['model_weights'],
+                          avg_score)
         ch.basic_ack(delivery_tag=method.delivery_tag)
     except Exception as ex:
         logging.exception(ex)
