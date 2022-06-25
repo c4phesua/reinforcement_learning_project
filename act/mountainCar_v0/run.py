@@ -1,17 +1,15 @@
 import json
 import logging
 import pickle
-from multiprocessing import Queue
 
 import gym
 from tensorflow.keras import optimizers, losses
 from tensorflow.keras.layers import Dense
 
 from act.mountainCar_v0.constant import EVALUATION_QUEUE_NAME, PROFILE_NAME
-from src.clients.loss_writing_client import LossWritingClient
 from src.dqn.dqn_model import DQN
+from src.repositories.cassandra_repo import insert_batch, insert_loss
 from src.utils.file_utils import load_json_file
-from src.repositories.mongodb_repo import create_new_batch, get_mongo_client
 from src.utils.rabbitmq_utils import send_message, create_evaluate_request
 
 configs = load_json_file('configs.json')
@@ -75,11 +73,7 @@ if __name__ == '__main__':
     configs['net'] = agent.training_network.to_json()
 
     # create_queue(EVALUATION_QUEUE_NAME)
-    mongo_client = get_mongo_client()
-    batch_id = create_new_batch(PROFILE_NAME, configs, mongo_client)
-    loss_writing_queue = Queue()
-    loss_writing_client = LossWritingClient(loss_writing_queue)
-    loss_writing_client.start()
+    batch_id = str(insert_batch(PROFILE_NAME, json.dumps(configs)))
 
     for i in range(episode):
         logging.debug('----------episode {}------------'.format(i))
@@ -96,12 +90,10 @@ if __name__ == '__main__':
             agent.take_reward(reward_function(coins_arr, observation, done), observation, done)
             log = agent.train_network(configs['batch_size'], 1, 1, cer_mode=True)
             if log:
-                loss_writing_queue.put({'collection_name': PROFILE_NAME, 'batch_id': batch_id, 'loss': log[0]})
+                insert_loss(PROFILE_NAME, batch_id, log[0])
             agent.update_target_network(configs['tau'])
             agent.epsilon_greedy.decay(decay_value, configs['min_epsilon'])
         send_message(EVALUATION_QUEUE_NAME,
                      message=json.dumps(create_evaluate_request(PROFILE_NAME, batch_id, i,
                                                                 pickle.dumps(
                                                                     agent.training_network.get_weights()).hex())))
-    loss_writing_queue.put(None)
-    loss_writing_client.join()
