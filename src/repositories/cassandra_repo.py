@@ -15,7 +15,7 @@ session = cluster.connect()
 # prepare keyspace
 session.execute('''
                     CREATE KEYSPACE IF NOT EXISTS reinforcement_learning_project
-                    WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 3 };
+                    WITH REPLICATION = { 'class' : 'NetworkTopologyStrategy', 'datacenter1' : 2, 'datacenter2': 2};
                 ''')
 session.set_keyspace('reinforcement_learning_project')
 
