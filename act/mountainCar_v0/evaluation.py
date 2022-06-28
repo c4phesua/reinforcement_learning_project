@@ -14,16 +14,16 @@ from src.utils.rabbitmq_utils import start_consumer
 
 env = gym.make('MountainCar-v0')
 configs = load_json_file('configs.json')
+agent = DQN(configs['discount_factor'], configs['epsilon'], configs['e_min'], configs['e_max'])
+optimizer_b = optimizers.Adam(learning_rate=configs['optimizer']['learning_rate'])
+agent.training_network.add(Dense(64, activation='elu', input_shape=(2,)))
+agent.training_network.add(Dense(32, activation='elu'))
+agent.training_network.add(Dense(3, activation='linear'))
+agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=configs['loss_func']['delta']))
 
 
 def evaluation_function(ch, method, properties, body):
     json_body = json.loads(body)
-    agent = DQN(configs['discount_factor'], configs['epsilon'], configs['e_min'], configs['e_max'])
-    optimizer_b = optimizers.Adam(learning_rate=configs['optimizer']['learning_rate'])
-    agent.training_network.add(Dense(64, activation='elu', input_shape=(2,)))
-    agent.training_network.add(Dense(32, activation='elu'))
-    agent.training_network.add(Dense(3, activation='elu'))
-    agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=configs['loss_func']['delta']))
     agent.training_network.set_weights(pickle.loads(bytes.fromhex(json_body['model_weights'])))
     logging.debug('----------episode {}------------'.format(json_body['episode']))
     avg_score = 0
@@ -38,7 +38,7 @@ def evaluation_function(ch, method, properties, body):
                 action = agent.observe(observation)
                 observation, reward, done, _ = env.step(action)
                 score += reward
-                # env.render()
+                env.render()
             avg_score += score / float(total_trial)
         logging.debug(f'------avg score = {avg_score}-----------')
         insert_evaluation(PROFILE_NAME, json_body['batch_id'], json_body['episode'], json_body['model_weights'],
