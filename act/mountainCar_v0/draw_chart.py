@@ -1,11 +1,10 @@
 from matplotlib import pyplot as plt
 
 from act.mountainCar_v0.constant import PROFILE_NAME
-from src.repositories.mongodb_repo import get_mongo_client, get_evaluate_report
+from src.repositories.cassandra_repo import get_losses
 
 if __name__ == '__main__':
-    mongo_client = get_mongo_client()
-    data = get_evaluate_report(PROFILE_NAME, 'a670ab94-6ae5-4525-9636-31574022003b', mongo_client)
+    data = get_losses(PROFILE_NAME, '055af61a-5bff-4885-b1b5-1fe33cc8d8a1')
     data.sort(key=lambda x: x['create_at'])
-    plt.plot(list(range(len(data))), [x['score'] for x in data])
+    plt.plot(list(range(len(data))), [x['loss'] for x in data])
     plt.show()
