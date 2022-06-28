@@ -8,9 +8,10 @@ from tensorflow.keras.layers import Dense
 
 from act.mountainCar_v0.constant import EVALUATION_QUEUE_NAME, PROFILE_NAME
 from src.dqn.dqn_model import DQN
-from src.repositories.cassandra_repo import insert_batch, insert_loss
+from src.repositories.cassandra_repo import insert_loss
+from src.utils.act_utils import get_batch_id
 from src.utils.file_utils import load_json_file
-from src.utils.rabbitmq_utils import send_message, create_evaluate_request
+from src.utils.rabbitmq_utils import send_message, create_evaluate_request, create_queue
 
 configs = load_json_file('configs.json')
 
@@ -57,13 +58,13 @@ if __name__ == '__main__':
     optimizer_a = optimizers.Adam(learning_rate=configs['optimizer']['learning_rate'])
     agent.target_network.add(Dense(64, activation='elu', input_shape=(2,)))
     agent.target_network.add(Dense(32, activation='elu'))
-    agent.target_network.add(Dense(3, activation='elu'))
+    agent.target_network.add(Dense(3, activation='linear'))
     agent.target_network.compile(optimizer=optimizer_a, loss=losses.Huber(delta=configs['loss_func']['delta']))
 
     optimizer_b = optimizers.Adam(learning_rate=configs['optimizer']['learning_rate'])
     agent.training_network.add(Dense(64, activation='elu', input_shape=(2,)))
     agent.training_network.add(Dense(32, activation='elu'))
-    agent.training_network.add(Dense(3, activation='elu'))
+    agent.training_network.add(Dense(3, activation='linear'))
     agent.training_network.compile(optimizer=optimizer_b, loss=losses.Huber(delta=configs['loss_func']['delta']))
     episode = configs['total_episode']
     env = gym.make('MountainCar-v0')
@@ -72,8 +73,8 @@ if __name__ == '__main__':
     agent.update_target_network()
     configs['net'] = agent.training_network.to_json()
 
-    # create_queue(EVALUATION_QUEUE_NAME)
-    batch_id = str(insert_batch(PROFILE_NAME, json.dumps(configs)))
+    create_queue(EVALUATION_QUEUE_NAME)
+    batch_id = get_batch_id(agent, configs, PROFILE_NAME)
 
     for i in range(episode):
         logging.debug('----------episode {}------------'.format(i))
