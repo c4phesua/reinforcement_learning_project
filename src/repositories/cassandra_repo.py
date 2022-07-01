@@ -82,7 +82,7 @@ def insert_loss(environment_name: str, batch_id: str, loss):
                                  {'new_record': json.dumps(new_docs)})
 
 
-def get_losses(environment_name: str, batch_id: str):
+def get_losses(environment_name: str, batch_id: str) -> list:
     rows = session.execute('''
         SELECT JSON * from losses
         WHERE environment_name = %(environment_name)s and batch_id = %(batch_id)s;
@@ -90,10 +90,18 @@ def get_losses(environment_name: str, batch_id: str):
     return [json.loads(row.json) for row in rows]
 
 
-def get_latest_evaluation(environment_name: str, batch_id: str):
+def get_latest_evaluation(environment_name: str, batch_id: str) -> dict:
     rows = session.execute('''
             SELECT JSON * from evaluations
             WHERE environment_name = %(environment_name)s AND batch_id = %(batch_id)s
             ORDER BY create_at DESC LIMIT 1;
         ''', {'environment_name': environment_name, 'batch_id': UUID(batch_id)})
     return json.loads(rows.one().json)
+
+
+def get_evaluations(environment_name: str, batch_id: str) -> list:
+    rows = session.execute('''
+        SELECT JSON episode, score, create_at from evaluations
+        WHERE environment_name = %(environment_name)s and batch_id = %(batch_id)s;
+    ''', {'environment_name': environment_name, 'batch_id': UUID(batch_id)})
+    return [json.loads(row.json) for row in rows]
